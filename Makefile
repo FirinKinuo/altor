@@ -6,7 +6,7 @@ clean:
 
 build:
 	go mod download
-	CGO_ENABLED=0 go build -tags release -o $(PROJECT) main.go
+	CGO_ENABLED=0 go build -tags release -o $(PROJECT)-$(VERSION) cmd/main/main.go
 
 build-all:
 	mkdir -p _build

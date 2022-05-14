@@ -5,19 +5,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type WSURL struct {
+	Scheme  string
+	Host    string
+	BaseURN string
+}
+
 type Config struct {
 	Debug          bool
 	LogLevel       string
-	AnilibriaWSURL string
+	AnilibriaWSURL *WSURL
 }
 
 func NewConfig() (cfg *Config) {
 	debug := flag.Bool("debug", false, "enable debug mode")
 	logLevel := flag.String("log-level", "info", "set logging level")
-	anilibriaWSURL := flag.String(
-		"anilibria-ws-host",
-		"wss://api.anilibria.tv/v2/ws/",
-		"URL Anilibria websocket")
+	anilibriaWSScheme := flag.String("anilibria-ws-scheme", "wss", "Scheme Anilibria websocket")
+	anilibriaWSHost := flag.String("anilibria-ws-host", "api.anilibria.tv", "Host Anilibria websocket")
+	anilibriaWSBaseURN := flag.String("anilibria-ws-urn", "v2/ws/", "URN Anilibria websocket")
 
 	flag.Parse()
 
@@ -28,9 +33,13 @@ func NewConfig() (cfg *Config) {
 	}
 
 	return &Config{
-		Debug:          *debug,
-		LogLevel:       *logLevel,
-		AnilibriaWSURL: *anilibriaWSURL,
+		Debug:    *debug,
+		LogLevel: *logLevel,
+		AnilibriaWSURL: &WSURL{
+			Scheme:  *anilibriaWSScheme,
+			Host:    *anilibriaWSHost,
+			BaseURN: *anilibriaWSBaseURN,
+		},
 	}
 }
 

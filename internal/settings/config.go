@@ -2,6 +2,7 @@ package settings
 
 import (
 	"flag"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -9,6 +10,14 @@ type WSURL struct {
 	Scheme  string
 	Host    string
 	BaseURN string
+}
+
+func (w *WSURL) GetURL() (url string) {
+	return fmt.Sprintf("%s://%s/%s", w.Scheme, w.Host, w.BaseURN)
+}
+
+func (w *WSURL) GetURLWithMethod(method string) (url string) {
+	return fmt.Sprintf("%s%s", w.GetURL(), method)
 }
 
 type Config struct {

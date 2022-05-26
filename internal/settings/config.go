@@ -7,16 +7,17 @@ import (
 
 // Flags structure with all arguments from the command line
 type Flags struct {
-	Debug                 bool
-	LogLevel              string
-	AnilibriaWSScheme     string
-	AnilibriaWSHost       string
-	AnilibriaWSPath       string
-	QBittorrentScheme     string
-	QBittorrentHost       string
-	QBittorrentUser       string
-	QBittorrentPassword   string
-	QBittorrentSaveFolder string
+	Debug                      bool
+	LogLevel                   string
+	AnilibriaWSScheme          string
+	AnilibriaWSHost            string
+	AnilibriaWSPath            string
+	QBittorrentScheme          string
+	QBittorrentHost            string
+	QBittorrentIgnoreTSLVerify bool
+	QBittorrentUser            string
+	QBittorrentPassword        string
+	QBittorrentSaveFolder      string
 }
 
 // NewFlags - constructor of the Flags structure
@@ -29,22 +30,27 @@ func NewFlags() (flags *Flags) {
 	qBittorrentScheme := flag.String("qbt-scheme", "http", "Scheme of qBittorrent Web Client")
 	qBittorrentHost := flag.String("qbt-host", "localhost:8080", "Host of qBittorrent Web Client")
 	qBittorrentUser := flag.String("qbt-user", "admin", "User for qBittorrent Web Client")
+	qBittorrentIgnoreTSLVerify := flag.Bool(
+		"qbt-ignore-tls-verify",
+		false,
+		"Ignore TLS verify for self-signed certificate for qBittorrent Web Client")
 	qBittorrentPassword := flag.String("qbt-password", "", "Password for qBittorrent Web Client")
 	qBittorrentSaveFolder := flag.String("qbt-save-folder", "", "Folder to save downloaded torrents")
 
 	flag.Parse()
 
 	return &Flags{
-		Debug:                 *debug,
-		LogLevel:              *logLevel,
-		AnilibriaWSScheme:     *anilibriaWSScheme,
-		AnilibriaWSHost:       *anilibriaWSHost,
-		AnilibriaWSPath:       *anilibriaWSPath,
-		QBittorrentScheme:     *qBittorrentScheme,
-		QBittorrentHost:       *qBittorrentHost,
-		QBittorrentUser:       *qBittorrentUser,
-		QBittorrentPassword:   *qBittorrentPassword,
-		QBittorrentSaveFolder: *qBittorrentSaveFolder,
+		Debug:                      *debug,
+		LogLevel:                   *logLevel,
+		AnilibriaWSScheme:          *anilibriaWSScheme,
+		AnilibriaWSHost:            *anilibriaWSHost,
+		AnilibriaWSPath:            *anilibriaWSPath,
+		QBittorrentScheme:          *qBittorrentScheme,
+		QBittorrentHost:            *qBittorrentHost,
+		QBittorrentUser:            *qBittorrentUser,
+		QBittorrentPassword:        *qBittorrentPassword,
+		QBittorrentSaveFolder:      *qBittorrentSaveFolder,
+		QBittorrentIgnoreTSLVerify: *qBittorrentIgnoreTSLVerify,
 	}
 }
 

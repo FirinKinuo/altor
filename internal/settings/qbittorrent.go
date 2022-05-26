@@ -7,7 +7,7 @@ import (
 
 // QBittorrent structure containing QBittorrent web-client configuration
 type QBittorrent struct {
-	URL             string
+	URL             url.URL
 	IgnoreTSLVerify bool
 	User            string
 	Password        string
@@ -18,7 +18,7 @@ func NewQBittorrentConfig(flags *Flags) (cfg *QBittorrent) {
 	qBittorrentURL := url.URL{Scheme: flags.QBittorrentScheme, Host: flags.QBittorrentHost}
 
 	qBittorrentConfig := QBittorrent{
-		URL:             qBittorrentURL.String(),
+		URL:             qBittorrentURL,
 		IgnoreTSLVerify: flags.QBittorrentIgnoreTSLVerify,
 		User:            flags.QBittorrentUser,
 		Password:        flags.QBittorrentPassword,

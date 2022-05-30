@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // CreateURLToEndpoint returns full URL up to endpoint
@@ -57,4 +58,9 @@ func (c *Client) AddCookiesToJar(cookies []*http.Cookie) {
 	if len(cookies) > 0 {
 		c.CookiesJar.SetCookies(&c.BaseURL, cookies)
 	}
+}
+
+// parseState will return True if ok. is returned in request body
+func parseState(body string) (state bool) {
+	return strings.Contains(strings.ToLower(body), "ok.")
 }

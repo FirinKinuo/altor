@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"mime/multipart"
-	"strings"
 )
 
 // createLoginPayload returns the writer and bytes.Buffer from the given login data
@@ -32,7 +31,7 @@ func createLoginPayload(username, password string) (writer *multipart.Writer, pa
 
 // parseIsLogin return true if authorization was successful
 func parseIsLogin(body string) (state bool) {
-	return strings.Contains(strings.ToLower(body), "ok.")
+	return parseState(body)
 }
 
 // Login sends an authorization request in the qBittorrent web client

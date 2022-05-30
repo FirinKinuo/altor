@@ -44,7 +44,7 @@ func (c *Client) Login(username, password string) (isLogin bool, err error) {
 
 	response, err := c.Post("auth/login", payload, writer)
 	if err != nil {
-		return false, nil
+		return false, fmt.Errorf("error when sending POST query, reason: %w", err)
 	}
 
 	body, err := ReadBodyFromResponse(response)

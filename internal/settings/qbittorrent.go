@@ -12,6 +12,7 @@ type QBittorrent struct {
 	User            string
 	Password        string
 	SaveFolder      string
+	Category        string
 }
 
 func NewQBittorrentConfig(flags *Flags) (cfg *QBittorrent) {
@@ -23,6 +24,7 @@ func NewQBittorrentConfig(flags *Flags) (cfg *QBittorrent) {
 		User:            flags.QBittorrentUser,
 		Password:        flags.QBittorrentPassword,
 		SaveFolder:      filepath.FromSlash(flags.QBittorrentSaveFolder),
+		Category:        flags.QBittorrentCategory,
 	}
 
 	return &qBittorrentConfig

@@ -18,6 +18,7 @@ type Flags struct {
 	QBittorrentUser            string
 	QBittorrentPassword        string
 	QBittorrentSaveFolder      string
+	QBittorrentCategory        string
 }
 
 // NewFlags - constructor of the Flags structure
@@ -36,6 +37,7 @@ func NewFlags() (flags *Flags) {
 		"Ignore TLS verify for self-signed certificate for qBittorrent Web Client")
 	qBittorrentPassword := flag.String("qbt-password", "", "Password for qBittorrent Web Client")
 	qBittorrentSaveFolder := flag.String("qbt-save-folder", "", "Folder to save downloaded torrents")
+	qBittorrentCategory := flag.String("qbt-category", "altor-bot", "Set custom category for torrent")
 
 	flag.Parse()
 
@@ -51,6 +53,7 @@ func NewFlags() (flags *Flags) {
 		QBittorrentPassword:        *qBittorrentPassword,
 		QBittorrentSaveFolder:      *qBittorrentSaveFolder,
 		QBittorrentIgnoreTSLVerify: *qBittorrentIgnoreTSLVerify,
+		QBittorrentCategory:        *qBittorrentCategory,
 	}
 }
 

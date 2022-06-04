@@ -3,12 +3,14 @@ package websocket
 import (
 	"altor/internal/websocket/messages"
 	"altor/internal/websocket/messages/connect"
+	"altor/internal/websocket/messages/torrent"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 )
 
 type AnilibriaWS struct {
-	conn *websocket.Conn
+	conn            *websocket.Conn
+	torrentsChannel chan<- []string
 }
 
 // NewAnilibriaWS - constructor of the AnilibriaWS struct, accepts the URL of the Anilibria websocket as input
@@ -21,6 +23,12 @@ func NewAnilibriaWS(wsURL string) (ws *AnilibriaWS, err error) {
 	return &AnilibriaWS{
 		conn: connection,
 	}, nil
+}
+
+// AttachTorrentsChannel Attaches a channel to handle torrent update messages
+// A channel is passed to the argument, which can only add data
+func (w *AnilibriaWS) AttachTorrentsChannel(torrentsChannel chan<- []string) {
+	w.torrentsChannel = torrentsChannel
 }
 
 // CloseConnection with Anilibria websocket
@@ -48,6 +56,19 @@ func (w *AnilibriaWS) CheckConnection(response []byte) (err error) {
 	return nil
 }
 
+func (w *AnilibriaWS) DownloadTorrent(response []byte) (err error) {
+	torrentMessage, err := torrent.Parse(response)
+	if err != nil {
+		return err
+	}
+
+	log.Info(torrentMessage)
+
+	w.torrentsChannel <- torrentMessage.GetTorrentsHash()
+
+	return nil
+}
+
 // ParseMessage from WebSocket response
 // Depending on the response received, the corresponding methods will be executed.
 func (w *AnilibriaWS) ParseMessage(response []byte) (err error) {
@@ -59,6 +80,13 @@ func (w *AnilibriaWS) ParseMessage(response []byte) (err error) {
 		if err != nil {
 			log.Panic(err)
 		}
+		break
+	case messages.TorrentUpdate:
+		err = w.DownloadTorrent(response)
+		if err != nil {
+			log.Error(err)
+		}
+		break
 	}
 
 	return nil

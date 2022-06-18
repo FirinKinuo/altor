@@ -9,8 +9,8 @@ WORKDIR /build
 
 COPY . .
 
-RUN go mod download
-RUN go build -ldflags="-s -w" -o /build/altor cmd/main/main.go
+#RUN go mod download
+RUN go build -ldflags="-s -w" -mod=mod -o /build/altor cmd/main/main.go
 
 FROM scratch
 ENV DEBUG=0 \

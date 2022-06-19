@@ -11,11 +11,11 @@ type AnilibriaWSConfig struct {
 	Path   string
 }
 
-func NewAnilibriaWSConfig(flags *Flags) (cfg *AnilibriaWSConfig) {
+func NewAnilibriaWSConfig(envs *Envs) (cfg *AnilibriaWSConfig) {
 	anilibriaWSConfig := AnilibriaWSConfig{
-		Scheme: flags.AnilibriaWSScheme,
-		Host:   flags.AnilibriaWSHost,
-		Path:   flags.AnilibriaWSPath,
+		Scheme: envs.AnilibriaWSScheme,
+		Host:   envs.AnilibriaWSHost,
+		Path:   envs.AnilibriaWSPath,
 	}
 
 	return &anilibriaWSConfig

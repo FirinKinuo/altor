@@ -1,12 +1,13 @@
 package settings
 
 import (
-	"flag"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"strconv"
 )
 
-// Flags structure with all arguments from the command line
-type Flags struct {
+// Envs structure with all project environments vars
+type Envs struct {
 	Debug                      bool
 	LogLevel                   string
 	AnilibriaWSScheme          string
@@ -21,39 +22,37 @@ type Flags struct {
 	QBittorrentCategory        string
 }
 
-// NewFlags - constructor of the Flags structure
-func NewFlags() (flags *Flags) {
-	debug := flag.Bool("debug", false, "enable debug mode")
-	logLevel := flag.String("log-level", "info", "set logging level")
-	anilibriaWSScheme := flag.String("anilibria-ws-scheme", "wss", "Scheme Anilibria websocket")
-	anilibriaWSHost := flag.String("anilibria-ws-host", "api.anilibria.tv", "Host Anilibria websocket")
-	anilibriaWSPath := flag.String("anilibria-ws-path", "v2/ws/", "Path Anilibria websocket")
-	qBittorrentScheme := flag.String("qbt-scheme", "http", "Scheme of qBittorrent Web Client")
-	qBittorrentHost := flag.String("qbt-host", "localhost:8080", "Host of qBittorrent Web Client")
-	qBittorrentUser := flag.String("qbt-user", "admin", "User for qBittorrent Web Client")
-	qBittorrentIgnoreTSLVerify := flag.Bool(
-		"qbt-ignore-tls-verify",
-		false,
-		"Ignore TLS verify for self-signed certificate for qBittorrent Web Client")
-	qBittorrentPassword := flag.String("qbt-password", "", "Password for qBittorrent Web Client")
-	qBittorrentSaveFolder := flag.String("qbt-save-folder", "", "Folder to save downloaded torrents")
-	qBittorrentCategory := flag.String("qbt-category", "altor-bot", "Set custom category for torrent")
+// NewEnvs - constructor of the Envs structure
+// Returns a pointer to the created structure with project environment variables
+// Doesn't panic if an invalid variable is specified
+// Will log the fatal level with an erroneous parameter
+func NewEnvs() (envs *Envs) {
+	debug := getEnvBool("DEBUG", false)
+	logLevel := getEnvString("LOG_LEVEL", "info")
+	anilibriaWSScheme := getEnvString("ANILIBRIA_WS_SCHEME", "wss")
+	anilibriaWSHost := getEnvString("ANILIBRIA_WS_HOST", "api.anilibria.tv")
+	anilibriaWSPath := getEnvString("ANILIBRIA_WS_PATH", "v2/ws/")
+	qBittorrentScheme := getEnvString("QBT_SCHEME", "http")
+	qBittorrentHost := getEnvString("QBT_HOST", "localhost:8080")
+	qBittorrentUser := getEnvString("QBT_USER", "admin")
+	qBittorrentIgnoreTSLVerify := getEnvBool("QBT_IGNORE_TLS_VERIFY", false)
+	qBittorrentPassword := getEnvString("QBT_PASSWORD", "")
+	qBittorrentSaveFolder := getEnvString("QBT_SAVE_FOLDER", "")
+	qBittorrentCategory := getEnvString("QBT_CATEGORY", "altor-bot")
 
-	flag.Parse()
-
-	return &Flags{
-		Debug:                      *debug,
-		LogLevel:                   *logLevel,
-		AnilibriaWSScheme:          *anilibriaWSScheme,
-		AnilibriaWSHost:            *anilibriaWSHost,
-		AnilibriaWSPath:            *anilibriaWSPath,
-		QBittorrentScheme:          *qBittorrentScheme,
-		QBittorrentHost:            *qBittorrentHost,
-		QBittorrentUser:            *qBittorrentUser,
-		QBittorrentPassword:        *qBittorrentPassword,
-		QBittorrentSaveFolder:      *qBittorrentSaveFolder,
-		QBittorrentIgnoreTSLVerify: *qBittorrentIgnoreTSLVerify,
-		QBittorrentCategory:        *qBittorrentCategory,
+	return &Envs{
+		Debug:                      debug,
+		LogLevel:                   logLevel,
+		AnilibriaWSScheme:          anilibriaWSScheme,
+		AnilibriaWSHost:            anilibriaWSHost,
+		AnilibriaWSPath:            anilibriaWSPath,
+		QBittorrentScheme:          qBittorrentScheme,
+		QBittorrentHost:            qBittorrentHost,
+		QBittorrentUser:            qBittorrentUser,
+		QBittorrentPassword:        qBittorrentPassword,
+		QBittorrentSaveFolder:      qBittorrentSaveFolder,
+		QBittorrentIgnoreTSLVerify: qBittorrentIgnoreTSLVerify,
+		QBittorrentCategory:        qBittorrentCategory,
 	}
 }
 
@@ -66,21 +65,24 @@ type Config struct {
 }
 
 // NewConfig Config structure constructor
+// Returns a pointer to the created structure Config
+// Takes data from environment variables
+// If variables with the wrong type were specified, it will output an error to the Fatal log with variable key
 func NewConfig() (cfg *Config) {
-	flags := NewFlags()
+	envs := NewEnvs()
 
 	// Switching the logger level to debug mode
 	// It is logical that during debugging all logs are needed
-	if flags.Debug {
-		flags.LogLevel = "debug"
+	if envs.Debug {
+		envs.LogLevel = "debug"
 	}
 
-	anilibriaConfig := NewAnilibriaWSConfig(flags)
-	qBittorrentConfig := NewQBittorrentConfig(flags)
+	anilibriaConfig := NewAnilibriaWSConfig(envs)
+	qBittorrentConfig := NewQBittorrentConfig(envs)
 
 	return &Config{
-		Debug:          flags.Debug,
-		LogLevel:       flags.LogLevel,
+		Debug:          envs.Debug,
+		LogLevel:       envs.LogLevel,
 		AnilibriaWSURL: anilibriaConfig,
 		QBittorrent:    qBittorrentConfig,
 	}
@@ -96,4 +98,29 @@ func ConfigureLogger(logLevel string) {
 			Info("set log level to \"info\" by default")
 	}
 	log.SetLevel(level)
+}
+
+func getEnvString(key string, default_ string) (value string) {
+	value, exists := os.LookupEnv(key)
+
+	if exists {
+		return value
+	}
+
+	return default_
+}
+
+func getEnvBool(key string, default_ bool) (value bool) {
+	valueString, exist := os.LookupEnv(key)
+
+	if exist {
+		value, err := strconv.ParseBool(valueString)
+		if err != nil {
+			log.Fatalf("env %s is not a bool", key)
+		}
+
+		return value
+	}
+
+	return default_
 }

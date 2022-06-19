@@ -15,16 +15,16 @@ type QBittorrent struct {
 	Category        string
 }
 
-func NewQBittorrentConfig(flags *Flags) (cfg *QBittorrent) {
-	qBittorrentURL := url.URL{Scheme: flags.QBittorrentScheme, Host: flags.QBittorrentHost}
+func NewQBittorrentConfig(envs *Envs) (cfg *QBittorrent) {
+	qBittorrentURL := url.URL{Scheme: envs.QBittorrentScheme, Host: envs.QBittorrentHost}
 
 	qBittorrentConfig := QBittorrent{
 		URL:             qBittorrentURL,
-		IgnoreTSLVerify: flags.QBittorrentIgnoreTSLVerify,
-		User:            flags.QBittorrentUser,
-		Password:        flags.QBittorrentPassword,
-		SaveFolder:      filepath.FromSlash(flags.QBittorrentSaveFolder),
-		Category:        flags.QBittorrentCategory,
+		IgnoreTSLVerify: envs.QBittorrentIgnoreTSLVerify,
+		User:            envs.QBittorrentUser,
+		Password:        envs.QBittorrentPassword,
+		SaveFolder:      filepath.FromSlash(envs.QBittorrentSaveFolder),
+		Category:        envs.QBittorrentCategory,
 	}
 
 	return &qBittorrentConfig
